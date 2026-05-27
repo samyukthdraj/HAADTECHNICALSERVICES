@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Calculator, Send, Printer, RefreshCw, CheckCircle } from "lucide-react";
+import { Plus, Trash2, Send, Printer, RefreshCw, CheckCircle } from "lucide-react";
 
 interface ManpowerRow {
   id: string;
@@ -33,7 +33,10 @@ export default function QuotationCalculator() {
   // Auto-generate reference on component load
   useEffect(() => {
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    setProjectRef(`HTS-QT-2026-${randomSuffix}`);
+    const timer = setTimeout(() => {
+      setProjectRef(`HTS-QT-2026-${randomSuffix}`);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleAddRow = () => {
@@ -52,15 +55,17 @@ export default function QuotationCalculator() {
     setRows(rows.filter((row) => row.id !== id));
   };
 
-  const handleRowChange = (id: string, field: keyof ManpowerRow, value: any) => {
+  const handleRowChange = (id: string, field: keyof ManpowerRow, value: string | number) => {
     setRows(
       rows.map((row) => {
         if (row.id === id) {
           if (field === "designation") {
-            return { ...row, [field]: value };
+            return { ...row, designation: String(value) };
           }
-          const numValue = parseFloat(value) || 0;
-          return { ...row, [field]: numValue };
+          const numValue = typeof value === "number" ? value : parseFloat(value) || 0;
+          if (field === "quantity") return { ...row, quantity: numValue };
+          if (field === "hours") return { ...row, hours: numValue };
+          if (field === "rate") return { ...row, rate: numValue };
         }
         return row;
       })

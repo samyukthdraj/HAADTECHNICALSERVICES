@@ -93,7 +93,8 @@ export default function QuotationCalculator() {
     setIsSubmitting(true);
     setSubmitResult(null);
     try {
-      const response = await fetch("http://localhost:5000/api/quotation", {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "https://haadtechnicalservicescollc-delta.vercel.app";
+      const response = await fetch(`${backendUrl}/api/quotation`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

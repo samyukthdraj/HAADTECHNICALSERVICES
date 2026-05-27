@@ -43,7 +43,8 @@ export default function ContactPage() {
     setStatus({ type: null, message: "" });
 
     try {
-      const response = await fetch("http://localhost:5000/api/inquiry", {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "https://haadtechnicalservicescollc-delta.vercel.app";
+      const response = await fetch(`${backendUrl}/api/inquiry`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

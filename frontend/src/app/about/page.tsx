@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import { Flag, Shield, Landmark, Users, Hammer, Settings } from "lucide-react";
+import { Flag, Shield, Users, Hammer, Settings } from "lucide-react";
 
 export default function AboutPage() {
   const team = [
@@ -102,7 +102,7 @@ export default function AboutPage() {
                 </span>
                 <h4 className="hts-headline-md text-sm font-bold text-[#1A1A1A] mb-1">Zero Incident Target</h4>
                 <p className="hts-body-md text-xs text-[#5c5b5b] leading-relaxed">
-                  Safety is not an option; it is built into our core operations. Rigorous training and strict compliance with Dubai's regulatory standards.
+                  Safety is not an option; it is built into our core operations. Rigorous training and strict compliance with Dubai&apos;s regulatory standards.
                 </p>
               </div>
             </div>

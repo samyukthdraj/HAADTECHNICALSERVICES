@@ -5,7 +5,6 @@ import {
   Hammer,
   Compass,
   Users,
-  Grid,
   Scissors,
   Wrench,
   Anchor,

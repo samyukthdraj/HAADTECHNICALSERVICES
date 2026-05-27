@@ -17,6 +17,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "HAAD Technical Services Co. L.L.C.",
   description: "HAAD Technical Services Co. L.L.C. - Dubai's leading technical services and manpower provider.",
+  icons: {
+    icon: "/haad_favicon.png",
+  },
 };
 
 export default function RootLayout({

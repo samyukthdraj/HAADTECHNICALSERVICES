@@ -24,7 +24,7 @@ export default function Home() {
                 • DUBAI TECHNICAL SERVICES PROVIDER
               </span>
               <h2 className="hts-display-lg font-black text-[#1A1A1A] leading-tight">
-                INDUSTRIAL SCALE PRECISION CONTRACTION & MANPOWER
+                INDUSTRIAL SCALE PRECISION CONTRACTING & MANPOWER
               </h2>
               <p className="hts-body-lg text-[#5c5b5b] leading-relaxed">
                 HAAD Technical Services Co. L.L.C. is an engineered solutions contractor based in Dubai, UAE. We specialize in MEP contracting, electrical installations, HVAC retrofits, and high-quality skilled manpower supply for commercial, civil, and industrial developments.

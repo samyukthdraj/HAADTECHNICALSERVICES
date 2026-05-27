@@ -1,65 +1,59 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import * as Lucide from "lucide-react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import {
-  Ship,
-  Hammer,
-  Compass,
-  Users,
-  Scissors,
-  Wrench,
-  Anchor,
-  Flame,
-  LayoutGrid
-} from "lucide-react";
+import { useSettings } from "../../context/SettingsContext";
+
+interface ServiceItem {
+  _id: string;
+  title: string;
+  description: string;
+  iconName: string;
+  serviceCode: string;
+  rate: number;
+  order: number;
+}
 
 export default function ServicesPage() {
-  const portfolio = [
-    {
-      title: "CARPENTRY",
-      description: "Skilled carpenters for industrial formwork, structural woodwork, and precise finish carpentry required in complex construction and marine environments.",
-      icon: Hammer,
-    },
-    {
-      title: "DECK HANDS",
-      description: "Experienced marine deck hands certified for safety and efficiency in dry dock operations, vessel maintenance, and offshore support roles.",
-      icon: Anchor,
-    },
-    {
-      title: "HELPER",
-      description: "Reliable and resilient general labor force crucial for site preparation, material handling, and assisting specialized tradesmen safely.",
-      icon: Users,
-    },
-    {
-      title: "MASON",
-      description: "Expert masons proficient in structural brickwork, blockwork, concrete finishing, and heavy industrial masonry tasks.",
-      icon: LayoutGrid,
-    },
-    {
-      title: "STEEL FIXER",
-      description: "Precision steel fixers trained to interpret complex structural drawings and securely position reinforcement bars for critical concrete structures.",
-      icon: Wrench,
-    },
-    {
-      title: "WELDER",
-      description: "Certified industrial welders (MIG, TIG, ARC) specializing in structural steel, pipefitting, and marine-grade fabrication.",
-      icon: Flame,
-    },
-    {
-      title: "PLATER",
-      description: "Specialized steel platers for heavy fabrication, ship repair, and structural assembly, ensuring exact tolerances in heavy industry.",
-      icon: Scissors,
-    },
-    {
-      title: "MECHANIC",
-      description: "Industrial and marine mechanics capable of maintaining, diagnosing, and repairing heavy machinery and plant equipment.",
-      icon: Wrench,
-    },
-    {
-      title: "RIGGER",
-      description: "Certified riggers expert in safe lifting operations, securing heavy loads, and operating in complex crane and scaffolding environments.",
-      icon: Compass,
-    },
-  ];
+  const { settings } = useSettings();
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const getBackendUrl = () => {
+    return process.env.NEXT_PUBLIC_API_URL || "https://haadtechnicalservicescollc-delta.vercel.app";
+  };
+
+  useEffect(() => {
+    async function fetchServices() {
+      try {
+        const res = await fetch(`${getBackendUrl()}/api/services`);
+        if (res.ok) {
+          const data = await res.json();
+          setServices(data);
+        }
+      } catch (err) {
+        console.error("Failed to load services:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchServices();
+  }, []);
+
+  // Helper to dynamically resolve Lucide components from their database string identifier
+  const getIcon = (name: string) => {
+    const IconComp = (Lucide as any)[name];
+    if (IconComp) return <IconComp className="w-5 h-5" />;
+    return <Lucide.Wrench className="w-5 h-5" />;
+  };
+
+  const getSpecialtyIcon = (name: string) => {
+    const IconComp = (Lucide as any)[name];
+    if (IconComp) return <IconComp className="w-12 h-12 text-white" />;
+    return <Lucide.Ship className="w-12 h-12 text-white" />;
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background selection:bg-[#ba0013] selection:text-white">
@@ -71,7 +65,7 @@ export default function ServicesPage() {
           <span className="hts-label-sm text-xs text-[#006d39] font-bold block mb-1">
             • SERVICE PORTFOLIO
           </span>
-          <h2 className="hts-headline-lg font-black text-[#1A1A1A]">TECHNICAL MANPOWER SOLUTIONS</h2>
+          <h2 className="hts-display-lg text-[#1A1A1A] font-black uppercase">TECHNICAL MANPOWER SOLUTIONS</h2>
           <span className="hts-label-md text-xs text-[#5c5b5b] mt-1 block">
             SPECIALIZED INDUSTRIAL AND MARINE WORKFORCE DEPLOYMENT IN DUBAI.
           </span>
@@ -82,9 +76,9 @@ export default function ServicesPage() {
           className="border-2 border-[#1A1A1A] bg-[#eeeeee] p-6 md:p-8 flex flex-col md:flex-row items-center gap-6"
           style={{ borderRadius: "0px" }}
         >
-          {/* Ship Icon Square */}
+          {/* Icon Square */}
           <div className="w-24 h-24 bg-[#ba0013] border-2 border-[#1A1A1A] flex items-center justify-center shrink-0" style={{ borderRadius: "0px" }}>
-            <Ship className="w-12 h-12 text-white" />
+            {getSpecialtyIcon(settings.coreSpecialtyIcon)}
           </div>
           
           <div className="flex flex-col gap-2">
@@ -93,11 +87,11 @@ export default function ServicesPage() {
                 CORE SPECIALTY
               </span>
             </div>
-            <h3 className="hts-headline-md text-lg font-bold text-[#1A1A1A]">
-              MANPOWER SERVICES REGULARLY PROVIDED TO DRY DOCKS WORLD DUBAI
+            <h3 className="hts-headline-md font-bold text-[#1A1A1A] uppercase">
+              {settings.coreSpecialtyTitle}
             </h3>
             <p className="hts-body-md text-sm text-[#5c5b5b] leading-relaxed max-w-4xl">
-              We are a trusted partner for large-scale marine and industrial operations, supplying highly skilled, certified personnel ready for immediate deployment in high-stakes technical environments.
+              {settings.coreSpecialtyText}
             </p>
           </div>
         </section>
@@ -108,18 +102,25 @@ export default function ServicesPage() {
             Comprehensive Manpower Portfolio
           </h4>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {portfolio.map((item, index) => {
-              const Icon = item.icon;
-              return (
+          {loading ? (
+            <div className="text-center py-12 text-[#5c5b5b] hts-label-sm">
+              Loading dynamic services registry...
+            </div>
+          ) : services.length === 0 ? (
+            <div className="text-center py-12 text-[#5c5b5b] hts-label-sm">
+              No services registered in the database.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {services.map((item) => (
                 <div
-                  key={index}
-                  className="border-2 border-[#1A1A1A] bg-white p-6 flex flex-col justify-between gap-4 relative"
+                  key={item._id}
+                  className="border-2 border-[#1A1A1A] bg-white p-6 flex flex-col justify-between gap-6 relative"
                   style={{ borderRadius: "0px" }}
                 >
                   {/* Small top-right icon indicator */}
                   <div className="absolute top-4 right-4 text-[#5c5b5b]/40">
-                    <Icon className="w-5 h-5" />
+                    {getIcon(item.iconName)}
                   </div>
 
                   <div className="flex flex-col gap-3">
@@ -130,13 +131,18 @@ export default function ServicesPage() {
                       {item.description}
                     </p>
                   </div>
-                  <span className="hts-label-sm text-[9px] text-[#ba0013] font-bold block">
-                    HTS-ROLE: {item.title.substring(0, 3)}-{String(100 + index)}
-                  </span>
+                  <div className="flex justify-between items-center border-t border-[#eeeeee] pt-2">
+                    <span className="hts-label-sm text-[9px] text-[#ba0013] font-bold block">
+                      {item.serviceCode || `HTS-ROLE: ${item.title.substring(0, 3).toUpperCase()}`}
+                    </span>
+                    <span className="hts-label-sm text-[9px] text-[#006d39] font-bold block font-mono">
+                      RATE: {item.rate.toFixed(2)} AED/HR
+                    </span>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       </main>
 

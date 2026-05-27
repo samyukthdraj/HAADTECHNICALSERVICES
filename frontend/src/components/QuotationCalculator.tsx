@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Trash2, Send, Printer, RefreshCw, CheckCircle } from "lucide-react";
+import { Plus, Trash2, Send, Printer, RefreshCw, CheckCircle, Ship } from "lucide-react";
+import { useSettings } from "../context/SettingsContext";
 
 interface ManpowerRow {
   id: string;
@@ -11,15 +12,18 @@ interface ManpowerRow {
   rate: number;
 }
 
-const DEFAULT_ROWS: ManpowerRow[] = [
-  { id: "1", designation: "HVAC Senior Technician", quantity: 2, hours: 80, rate: 35 },
-  { id: "2", designation: "Electrical Contracting Technician", quantity: 3, hours: 120, rate: 30 },
-  { id: "3", designation: "Plumbing & Pipe Fitter", quantity: 2, hours: 80, rate: 28 },
-  { id: "4", designation: "General Technical Helper / Laborer", quantity: 5, hours: 160, rate: 16 },
-];
+interface ServiceItem {
+  _id: string;
+  title: string;
+  description: string;
+  serviceCode: string;
+  rate: number;
+}
 
 export default function QuotationCalculator() {
-  const [rows, setRows] = useState<ManpowerRow[]>(DEFAULT_ROWS);
+  const { settings } = useSettings();
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [rows, setRows] = useState<ManpowerRow[]>([]);
   const [clientName, setClientName] = useState("EMAAR PROPERTIES PJSC");
   const [projectRef, setProjectRef] = useState("HTS-QT-2026-4028");
   const [projectLocation, setProjectLocation] = useState("Downtown Dubai, UAE");
@@ -30,22 +34,51 @@ export default function QuotationCalculator() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<{ success: boolean; message: string } | null>(null);
 
+  const getBackendUrl = () => {
+    return process.env.NEXT_PUBLIC_API_URL || "https://haadtechnicalservicescollc-delta.vercel.app";
+  };
+
+  // Fetch dynamic services on mount & seed rows
+  useEffect(() => {
+    async function loadServices() {
+      try {
+        const res = await fetch(`${getBackendUrl()}/api/services`);
+        if (res.ok) {
+          const data: ServiceItem[] = await res.json();
+          setServices(data);
+          if (data && data.length > 0) {
+            // Seed initial rows based on the first few services fetched
+            const seededRows = data.slice(0, 3).map((svc, idx) => ({
+              id: String(idx + 1),
+              designation: svc.title,
+              quantity: idx === 0 ? 2 : 1,
+              hours: idx === 0 ? 80 : 120,
+              rate: svc.rate
+            }));
+            setRows(seededRows);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load services for dropdown estimator:", err);
+      }
+    }
+    loadServices();
+  }, []);
+
   // Auto-generate reference on component load
   useEffect(() => {
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const timer = setTimeout(() => {
-      setProjectRef(`HTS-QT-2026-${randomSuffix}`);
-    }, 0);
-    return () => clearTimeout(timer);
+    setProjectRef(`HTS-QT-2026-${randomSuffix}`);
   }, []);
 
   const handleAddRow = () => {
+    const fallbackService = services[0] || { title: "HELPER", rate: 18 };
     const newRow: ManpowerRow = {
       id: Date.now().toString(),
-      designation: "Technical Operator / Technician",
+      designation: fallbackService.title,
       quantity: 1,
       hours: 40,
-      rate: 25,
+      rate: fallbackService.rate,
     };
     setRows([...rows, newRow]);
   };
@@ -59,13 +92,26 @@ export default function QuotationCalculator() {
     setRows(
       rows.map((row) => {
         if (row.id === id) {
-          if (field === "designation") {
-            return { ...row, designation: String(value) };
-          }
           const numValue = typeof value === "number" ? value : parseFloat(value) || 0;
           if (field === "quantity") return { ...row, quantity: numValue };
           if (field === "hours") return { ...row, hours: numValue };
-          if (field === "rate") return { ...row, rate: numValue };
+        }
+        return row;
+      })
+    );
+  };
+
+  const handleDesignationSelect = (id: string, selectedTitle: string) => {
+    const matched = services.find((s) => s.title === selectedTitle);
+    if (!matched) return;
+    setRows(
+      rows.map((row) => {
+        if (row.id === id) {
+          return {
+            ...row,
+            designation: selectedTitle,
+            rate: matched.rate // Lock rate automatically to dynamic value
+          };
         }
         return row;
       })
@@ -73,7 +119,16 @@ export default function QuotationCalculator() {
   };
 
   const handleReset = () => {
-    setRows(DEFAULT_ROWS);
+    if (services.length > 0) {
+      const seededRows = services.slice(0, 3).map((svc, idx) => ({
+        id: String(idx + 1),
+        designation: svc.title,
+        quantity: idx === 0 ? 2 : 1,
+        hours: idx === 0 ? 80 : 120,
+        rate: svc.rate
+      }));
+      setRows(seededRows);
+    }
     setClientName("EMAAR PROPERTIES PJSC");
     setProjectLocation("Downtown Dubai, UAE");
     setDate(new Date().toISOString().split("T")[0]);
@@ -93,8 +148,7 @@ export default function QuotationCalculator() {
     setIsSubmitting(true);
     setSubmitResult(null);
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "https://haadtechnicalservicescollc-delta.vercel.app";
-      const response = await fetch(`${backendUrl}/api/quotation`, {
+      const response = await fetch(`${getBackendUrl()}/api/quotation`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -119,7 +173,8 @@ export default function QuotationCalculator() {
       });
 
       if (!response.ok) {
-        throw new Error("Server responded with an error");
+        const errData = await response.json();
+        throw new Error(errData.message || "Server responded with an error");
       }
 
       const data = await response.json();
@@ -128,11 +183,11 @@ export default function QuotationCalculator() {
         message: data.message || "Quotation details submitted successfully!",
       });
       setStatus("active");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Submission failed:", error);
       setSubmitResult({
         success: false,
-        message: "Failed to connect to the backend server. Make sure the backend is running on http://localhost:5000.",
+        message: error.message || "Failed to connect to the backend server.",
       });
     } finally {
       setIsSubmitting(false);
@@ -144,9 +199,38 @@ export default function QuotationCalculator() {
   };
 
   return (
-    <section className="w-full bg-white border-2 border-[#1A1A1A] p-4 md:p-8 relative" style={{ borderRadius: "0px" }}>
+    <section id="estimator" className="w-full bg-white border-2 border-[#1A1A1A] p-4 md:p-8 relative print-document-container scroll-mt-20" style={{ borderRadius: "0px" }}>
       {/* Top Banner Ribbon */}
-      <div className="absolute top-0 left-0 right-0 h-2 bg-[#ba0013]"></div>
+      <div className="absolute top-0 left-0 right-0 h-2 bg-[#ba0013] print:hidden"></div>
+
+      {/* Print-Only Professional Corporate Letterhead */}
+      <div className="hidden print:flex flex-row justify-between items-center border-b-2 border-[#1A1A1A] pb-4 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="relative w-12 h-12 border border-[#1A1A1A] p-0.5 bg-white shrink-0">
+            <img
+              src="/haad_logo.png"
+              alt="HTS Logo"
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-xl font-bold tracking-tight text-[#1A1A1A] flex items-baseline gap-0.5 leading-none">
+              <span className="text-[#ba0013]">HAAD</span>
+              <span className="text-[#1A1A1A]">TECHNICAL</span>
+              <span className="text-[#006d39]">SERVICES</span>
+            </h1>
+            <span className="text-[8px] text-[#5c5b5b] mt-0.5 tracking-[0.08em] uppercase font-mono">
+              CO. L.L.C. • TECHNICAL CONTRACTING
+            </span>
+          </div>
+        </div>
+        <div className="text-right font-mono text-[9px] text-[#5c5b5b] leading-tight uppercase">
+          {settings.email && <div>EMAIL: {settings.email}</div>}
+          {settings.phone && <div>MOB: {settings.phone}</div>}
+          {settings.address && <div>ADDR: {settings.address.split(",").slice(0, 3).join(", ")}</div>}
+          {settings.trnNo && <div>TRN NO: {settings.trnNo}</div>}
+        </div>
+      </div>
 
       {/* Sheet Title & Metadata */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 border-b border-[#1A1A1A] pb-6">
@@ -154,7 +238,7 @@ export default function QuotationCalculator() {
           <span className="hts-label-sm text-[10px] text-[#006d39] font-bold block mb-1">
             • OFFICIAL TECHNICAL SERVICES QUOTATION SHEET
           </span>
-          <h2 className="hts-headline-lg font-black text-[#1A1A1A]">MANPOWER COST ESTIMATION</h2>
+          <h2 className="hts-headline-lg font-black text-[#1A1A1A] uppercase">MANPOWER COST ESTIMATION</h2>
           <span className="hts-label-md text-xs text-[#5c5b5b] mt-1 block">
             JURISDICTION: DUBAI REGULATORY LAWS • RATE AED / HOUR
           </span>
@@ -164,76 +248,63 @@ export default function QuotationCalculator() {
         <div className="flex items-center gap-2 print:hidden">
           <span className="hts-label-sm text-[11px] text-[#5c5b5b]">SHEET STATUS:</span>
           <div className="flex border border-[#1A1A1A]" style={{ borderRadius: "0px" }}>
-            <button
-              onClick={() => setStatus("draft")}
-              className={`px-3 py-1 text-xs font-bold uppercase transition-all ${
-                status === "draft"
-                  ? "bg-[#5c5b5b] text-white"
-                  : "bg-white text-[#5c5b5b] hover:bg-[#F4F4F4]"
-              }`}
-              style={{ borderRadius: "0px" }}
-            >
-              Draft
-            </button>
-            <button
-              onClick={() => setStatus("active")}
-              className={`px-3 py-1 text-xs font-bold uppercase border-l border-[#1A1A1A] transition-all ${
-                status === "active"
-                  ? "bg-[#006d39] text-white"
-                  : "bg-white text-[#5c5b5b] hover:bg-[#F4F4F4]"
-              }`}
-              style={{ borderRadius: "0px" }}
-            >
-              Active
-            </button>
-            <button
-              onClick={() => setStatus("urgent")}
-              className={`px-3 py-1 text-xs font-bold uppercase border-l border-[#1A1A1A] transition-all ${
-                status === "urgent"
-                  ? "bg-[#ba0013] text-white"
-                  : "bg-white text-[#5c5b5b] hover:bg-[#F4F4F4]"
-              }`}
-              style={{ borderRadius: "0px" }}
-            >
-              Urgent
-            </button>
+            {["draft", "active", "urgent"].map((st) => (
+              <button
+                key={st}
+                onClick={() => setStatus(st as any)}
+                className={`px-3 py-1 text-xs font-bold uppercase transition-all border-r last:border-r-0 border-[#1A1A1A] ${
+                  status === st
+                    ? st === "draft"
+                      ? "bg-[#5c5b5b] text-white"
+                      : st === "active"
+                      ? "bg-[#006d39] text-white"
+                      : "bg-[#ba0013] text-white"
+                    : "bg-white text-[#5c5b5b] hover:bg-[#F4F4F4]"
+                }`}
+                style={{ borderRadius: "0px" }}
+              >
+                {st}
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Status Chip for Print (static) */}
         <div className="hidden print:block">
-          <div className={`px-4 py-1 text-xs font-bold uppercase border-2 border-[#1A1A1A]`}>
-            STATUS: {status.toUpperCase()}
+          <div className="px-4 py-1 text-xs font-bold uppercase border-2 border-[#1A1A1A]">
+            STATUS: {status}
           </div>
         </div>
       </div>
 
       {/* Form Fields Section */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 bg-[#F4F4F4] p-6 border border-[#1A1A1A]" style={{ borderRadius: "0px" }}>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 bg-[#F4F4F4] p-6 border border-[#1A1A1A] print:p-2 print:bg-white" style={{ borderRadius: "0px" }}>
         <div className="flex flex-col gap-1.5 md:col-span-2">
-          <label className="hts-label-sm text-[#1A1A1A]">CLIENT / PROJECT ENTITY</label>
+          <label className="hts-label-sm text-[#1A1A1A] font-bold">CLIENT / PROJECT ENTITY</label>
           <input
             type="text"
             value={clientName}
             onChange={(e) => setClientName(e.target.value.toUpperCase())}
-            className="w-full bg-white border border-[#1A1A1A] p-2.5 hts-body-md text-sm outline-none focus:border-[#ba0013] font-sans"
+            placeholder=""
+            className="w-full bg-white border border-[#1A1A1A] p-2.5 hts-body-md text-sm outline-none focus:border-[#ba0013] font-sans font-bold"
             style={{ borderRadius: "0px" }}
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="hts-label-sm text-[#1A1A1A]">QUOTATION REFERENCE</label>
+          <label className="hts-label-sm text-[#1A1A1A] font-bold">QUOTATION REFERENCE</label>
           <input
             type="text"
             value={projectRef}
             onChange={(e) => setProjectRef(e.target.value)}
-            className="w-full bg-white border border-[#1A1A1A] p-2.5 hts-label-md text-xs outline-none focus:border-[#ba0013]"
+            placeholder=""
+            className="w-full bg-white border border-[#1A1A1A] p-2.5 hts-label-md text-xs outline-none focus:border-[#ba0013] font-mono font-bold"
             style={{ borderRadius: "0px" }}
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="hts-label-sm text-[#1A1A1A]">DOCUMENT DATE</label>
+          <label className="hts-label-sm text-[#1A1A1A] font-bold">DOCUMENT DATE</label>
           <input
             type="date"
             value={date}
@@ -244,11 +315,12 @@ export default function QuotationCalculator() {
         </div>
 
         <div className="flex flex-col gap-1.5 md:col-span-4">
-          <label className="hts-label-sm text-[#1A1A1A]">PROJECT WORK SITE LOCATION</label>
+          <label className="hts-label-sm text-[#1A1A1A] font-bold">PROJECT WORK SITE LOCATION</label>
           <input
             type="text"
             value={projectLocation}
             onChange={(e) => setProjectLocation(e.target.value)}
+            placeholder=""
             className="w-full bg-white border border-[#1A1A1A] p-2.5 hts-body-md text-sm outline-none focus:border-[#ba0013]"
             style={{ borderRadius: "0px" }}
           />
@@ -260,13 +332,13 @@ export default function QuotationCalculator() {
         <table className="w-full text-left border-collapse min-w-[700px]">
           <thead>
             <tr className="bg-[#1A1A1A] text-white border-b border-[#1A1A1A]">
-              <th className="p-3 hts-label-md text-xs font-bold">ITEM NO</th>
-              <th className="p-3 hts-label-md text-xs font-bold w-[40%]">MANPOWER DESIGNATION / TECHNICAL SERVICE</th>
-              <th className="p-3 hts-label-md text-xs font-bold text-center">STAFF QTY</th>
-              <th className="p-3 hts-label-md text-xs font-bold text-center">TOTAL HOURS</th>
-              <th className="p-3 hts-label-md text-xs font-bold text-right">RATE (AED/HR)</th>
-              <th className="p-3 hts-label-md text-xs font-bold text-right">TOTAL (AED)</th>
-              <th className="p-3 hts-label-md text-xs font-bold text-center print:hidden">ACTION</th>
+              <th className="p-3 hts-label-md text-xs font-bold w-16 text-center">ITEM NO</th>
+              <th className="p-3 hts-label-md text-xs font-bold w-[45%]">MANPOWER DESIGNATION / TECHNICAL SERVICE</th>
+              <th className="p-3 hts-label-md text-xs font-bold text-center w-24">STAFF QTY</th>
+              <th className="p-3 hts-label-md text-xs font-bold text-center w-28">TOTAL HOURS</th>
+              <th className="p-3 hts-label-md text-xs font-bold text-right w-36">RATE (AED/HR)</th>
+              <th className="p-3 hts-label-md text-xs font-bold text-right w-36">TOTAL (AED)</th>
+              <th className="p-3 hts-label-md text-xs font-bold text-center w-20 print:hidden">ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -279,17 +351,26 @@ export default function QuotationCalculator() {
                     index % 2 === 0 ? "bg-white" : "bg-[#f9f9f9]"
                   }`}
                 >
-                  <td className="p-3 hts-label-md text-xs text-center border-r border-[#1A1A1A]">
+                  <td className="p-3 hts-label-md text-xs text-center border-r border-[#1A1A1A] font-mono">
                     {String(index + 1).padStart(2, "0")}
                   </td>
                   
                   <td className="p-2 border-r border-[#1A1A1A]">
-                    <input
-                      type="text"
+                    <select
                       value={row.designation}
-                      onChange={(e) => handleRowChange(row.id, "designation", e.target.value)}
-                      className="w-full bg-transparent p-1 hts-body-md text-sm outline-none border-b border-transparent focus:border-[#ba0013]"
-                    />
+                      onChange={(e) => handleDesignationSelect(row.id, e.target.value)}
+                      className="w-full bg-transparent p-1 hts-body-md text-sm outline-none border-b border-transparent focus:border-[#ba0013] font-sans font-bold cursor-pointer"
+                    >
+                      {services.length === 0 ? (
+                        <option value={row.designation}>{row.designation}</option>
+                      ) : (
+                        services.map((svc) => (
+                          <option key={svc._id} value={svc.title}>
+                            {svc.title.toUpperCase()} ({svc.serviceCode})
+                          </option>
+                        ))
+                      )}
+                    </select>
                   </td>
 
                   <td className="p-2 border-r border-[#1A1A1A] text-center">
@@ -298,7 +379,7 @@ export default function QuotationCalculator() {
                       min="1"
                       value={row.quantity || ""}
                       onChange={(e) => handleRowChange(row.id, "quantity", e.target.value)}
-                      className="w-20 bg-transparent p-1 text-center hts-label-md text-sm outline-none border-b border-transparent focus:border-[#ba0013]"
+                      className="w-full bg-transparent p-1 text-center hts-label-md text-sm outline-none border-b border-transparent focus:border-[#ba0013]"
                     />
                   </td>
 
@@ -308,19 +389,12 @@ export default function QuotationCalculator() {
                       min="1"
                       value={row.hours || ""}
                       onChange={(e) => handleRowChange(row.id, "hours", e.target.value)}
-                      className="w-24 bg-transparent p-1 text-center hts-label-md text-sm outline-none border-b border-transparent focus:border-[#ba0013]"
+                      className="w-full bg-transparent p-1 text-center hts-label-md text-sm outline-none border-b border-transparent focus:border-[#ba0013]"
                     />
                   </td>
 
-                  <td className="p-2 border-r border-[#1A1A1A] text-right">
-                    <input
-                      type="number"
-                      min="0.1"
-                      step="0.5"
-                      value={row.rate || ""}
-                      onChange={(e) => handleRowChange(row.id, "rate", e.target.value)}
-                      className="w-24 bg-transparent p-1 text-right hts-label-md text-sm outline-none border-b border-transparent focus:border-[#ba0013]"
-                    />
+                  <td className="p-3 border-r border-[#1A1A1A] text-right hts-label-md text-sm font-bold bg-[#F4F4F4]/30 text-[#5c5b5b]">
+                    {row.rate.toFixed(2)}
                   </td>
 
                   <td className="p-3 text-right hts-label-md text-sm font-bold bg-[#F4F4F4]/50 border-r border-[#1A1A1A]">
@@ -359,8 +433,8 @@ export default function QuotationCalculator() {
       <div className="flex flex-col md:flex-row justify-between items-start gap-8 border-t border-[#1A1A1A] pt-6">
         {/* Dynamic Notes Section */}
         <div className="w-full md:w-[50%]">
-          <h4 className="hts-label-md text-xs text-[#1A1A1A] mb-3">CONTRACTUAL TERMS & CONDITIONS</h4>
-          <ul className="space-y-1 text-xs text-[#5c5b5b] hts-body-md">
+          <h4 className="hts-label-md text-xs text-[#1A1A1A] mb-3 font-bold">CONTRACTUAL TERMS & CONDITIONS</h4>
+          <ul className="space-y-1 text-xs text-[#5c5b5b] hts-body-md leading-relaxed">
             <li>1. Manpower rates are inclusive of all local regulations, visa, and insurance costs.</li>
             <li>2. Standard working hours calculated as 8 hours/day, 6 days/week.</li>
             <li>3. Overtime rates apply at 1.25x basic hourly rate for extra hours.</li>
@@ -403,7 +477,7 @@ export default function QuotationCalculator() {
       {/* API Submission Status Banner */}
       {submitResult && (
         <div
-          className={`mt-8 p-4 flex items-start gap-3 border-2 ${
+          className={`mt-8 p-4 flex items-start gap-3 border-2 print:hidden ${
             submitResult.success
               ? "bg-[#87faaa]/20 border-[#006d39] text-[#00210d]"
               : "bg-red-50 border-[#ba1a1a] text-[#93000a]"
@@ -411,7 +485,7 @@ export default function QuotationCalculator() {
           style={{ borderRadius: "0px" }}
         >
           {submitResult.success && <CheckCircle className="w-5 h-5 text-[#006d39] shrink-0 mt-0.5" />}
-          <div className="text-sm">
+          <div className="text-sm font-sans">
             <span className="font-bold block hts-label-sm">
               {submitResult.success ? "SUBMISSION SUCCESS" : "SUBMISSION ERROR"}
             </span>
@@ -441,7 +515,7 @@ export default function QuotationCalculator() {
           
           <button
             onClick={handleSubmitQuote}
-            disabled={isSubmitting}
+            disabled={isSubmitting || rows.length === 0}
             className="flex items-center gap-2 px-6 py-2.5 bg-[#ba0013] hover:bg-[#e31e24] text-white transition-all hts-label-sm text-xs font-bold disabled:opacity-50"
             style={{ borderRadius: "0px" }}
           >

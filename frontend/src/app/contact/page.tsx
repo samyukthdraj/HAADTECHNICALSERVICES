@@ -86,6 +86,8 @@ export default function ContactPage() {
     }
   };
 
+  const hasContactCards = settings.phone || settings.email || settings.address;
+
   return (
     <div className="flex flex-col min-h-screen bg-background selection:bg-[#ba0013] selection:text-white">
       <Header />
@@ -96,7 +98,7 @@ export default function ContactPage() {
           <span className="hts-label-sm text-xs text-[#006d39] font-bold block mb-1">
             • COMMUNICATION HUBS
           </span>
-          <h2 className="hts-headline-lg font-black text-[#1A1A1A]">CONTACT OPERATIONS</h2>
+          <h2 className="hts-display-lg text-[#1A1A1A] font-black uppercase">CONTACT OPERATIONS</h2>
           <span className="hts-label-md text-xs text-[#5c5b5b] mt-1 block">
             DIRECT COMMUNICATION CHANNELS FOR TECHNICAL INQUIRIES AND MANPOWER DEPLOYMENT IN DUBAI.
           </span>
@@ -105,61 +107,68 @@ export default function ContactPage() {
         {/* Content Columns Split */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Direct Info Cards */}
-          <div className="lg:col-span-5 flex flex-col gap-6">
-            
-            {/* Card 1: Direct Line */}
-            <div className="border border-[#1A1A1A] bg-white p-5 flex flex-col gap-2" style={{ borderRadius: "0px" }}>
-              <span className="hts-label-sm text-[10px] text-[#ba0013] font-bold flex items-center gap-1.5 border-b border-[#eeeeee] pb-1.5">
-                <Phone className="w-3.5 h-3.5" /> DIRECT LINE
-              </span>
-              <p className="hts-body-md text-[11px] text-[#5c5b5b] font-sans">
-                Immediate response for urgent technical services.
-              </p>
-              <span className="hts-display-lg text-xl md:text-2xl font-black text-[#1A1A1A] mt-1 block tracking-tight">
-                {settings.phone}
-              </span>
+          {hasContactCards && (
+            <div className="lg:col-span-5 flex flex-col gap-6">
+              
+              {/* Card 1: Direct Line */}
+              {settings.phone && (
+                <div className="border border-[#1A1A1A] bg-white p-5 flex flex-col gap-2" style={{ borderRadius: "0px" }}>
+                  <span className="hts-label-sm text-[10px] text-[#ba0013] font-bold flex items-center gap-1.5 border-b border-[#eeeeee] pb-1.5">
+                    <Phone className="w-3.5 h-3.5" /> DIRECT LINE
+                  </span>
+                  <p className="hts-body-md text-[11px] text-[#5c5b5b] font-sans">
+                    Immediate response for urgent technical services.
+                  </p>
+                  <span className="hts-display-lg text-xl md:text-2xl font-black text-[#1A1A1A] mt-1 block tracking-tight">
+                    {settings.phone}
+                  </span>
+                </div>
+              )}
+
+              {/* Card 2: Official Comm */}
+              {settings.email && (
+                <div className="border border-[#1A1A1A] bg-white p-5 flex flex-col gap-2" style={{ borderRadius: "0px" }}>
+                  <span className="hts-label-sm text-[10px] text-[#006d39] font-bold flex items-center gap-1.5 border-b border-[#eeeeee] pb-1.5">
+                    <Mail className="w-3.5 h-3.5" /> OFFICIAL COMM
+                  </span>
+                  <p className="hts-body-md text-[11px] text-[#5c5b5b] font-sans">
+                    For project proposals, quotes, and documentation.
+                  </p>
+                  <span className="hts-display-lg text-sm md:text-base font-bold text-[#1A1A1A] mt-1 block tracking-tight select-all break-all">
+                    {settings.email}
+                  </span>
+                </div>
+              )}
+
+              {/* Card 3: HQ Dubai + Image */}
+              {settings.address && (
+                <div className="border border-[#1A1A1A] bg-white p-5 flex flex-col gap-4" style={{ borderRadius: "0px" }}>
+                  <div className="flex flex-col gap-1">
+                    <span className="hts-label-sm text-[10px] text-[#1A1A1A] font-bold flex items-center gap-1.5 border-b border-[#eeeeee] pb-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#ba0013]" /> HQ DUBAI
+                    </span>
+                    <p className="text-[11px] text-[#5c5b5b] font-sans mt-2 leading-relaxed">
+                      <strong>HQ:</strong> {settings.address.toUpperCase()}
+                    </p>
+                  </div>
+
+                  {/* Cityscape Image Container */}
+                  <div className="relative w-full h-[180px] border border-[#1A1A1A]" style={{ borderRadius: "0px" }}>
+                    <Image
+                      src="/dubai_garhoud.png"
+                      alt="Dubai Garhoud Cityscape"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  </div>
+                </div>
+              )}
+
             </div>
+          )}
 
-            {/* Card 2: Official Comm */}
-            <div className="border border-[#1A1A1A] bg-white p-5 flex flex-col gap-2" style={{ borderRadius: "0px" }}>
-              <span className="hts-label-sm text-[10px] text-[#006d39] font-bold flex items-center gap-1.5 border-b border-[#eeeeee] pb-1.5">
-                <Mail className="w-3.5 h-3.5" /> OFFICIAL COMM
-              </span>
-              <p className="hts-body-md text-[11px] text-[#5c5b5b] font-sans">
-                For project proposals, quotes, and documentation.
-              </p>
-              <span className="hts-display-lg text-base md:text-lg font-bold text-[#1A1A1A] mt-1 block tracking-tight select-all">
-                {settings.email}
-              </span>
-            </div>
-
-            {/* Card 3: HQ Dubai + Image */}
-            <div className="border border-[#1A1A1A] bg-white p-5 flex flex-col gap-4" style={{ borderRadius: "0px" }}>
-              <div className="flex flex-col gap-1">
-                <span className="hts-label-sm text-[10px] text-[#1A1A1A] font-bold flex items-center gap-1.5 border-b border-[#eeeeee] pb-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#ba0013]" /> HQ DUBAI
-                </span>
-                <p className="text-[11px] text-[#5c5b5b] font-sans mt-2 leading-relaxed">
-                  <strong>HQ:</strong> {settings.address.toUpperCase()}
-                </p>
-              </div>
-
-              {/* Cityscape Image Container */}
-              <div className="relative w-full h-[180px] border border-[#1A1A1A]" style={{ borderRadius: "0px" }}>
-                <Image
-                  src="/dubai_garhoud.png"
-                  alt="Dubai Garhoud Cityscape"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-              </div>
-            </div>
-
-          </div>
-
-          {/* Right Column: Inquiry Log Form */}
-          <div className="lg:col-span-7 border border-[#1A1A1A] bg-white p-6 md:p-8 flex flex-col gap-6" style={{ borderRadius: "0px" }}>
+          <div className={`${hasContactCards ? "lg:col-span-7" : "lg:col-span-12"} border border-[#1A1A1A] bg-white p-6 md:p-8 flex flex-col gap-6`} style={{ borderRadius: "0px" }}>
             <span className="hts-label-sm text-xs text-[#006d39] font-bold flex items-center gap-2 border-b border-[#1A1A1A] pb-3 uppercase">
               <ClipboardList className="w-4 h-4 text-[#ba0013]" /> SERVICE INQUIRY LOG
             </span>
@@ -177,7 +186,7 @@ export default function ContactPage() {
                     name="entityName"
                     value={formData.entityName}
                     onChange={handleChange}
-                    placeholder="PLACEHOLDER"
+                    placeholder=""
                     className="w-full border border-[#1A1A1A] p-2.5 text-xs font-mono focus:outline-none focus:border-[#ba0013] transition-all bg-[#F9F9F9]"
                     style={{ borderRadius: "0px" }}
                     required
@@ -193,7 +202,7 @@ export default function ContactPage() {
                     name="contactNo"
                     value={formData.contactNo}
                     onChange={handleChange}
-                    placeholder="PLACEHOLDER"
+                    placeholder=""
                     className="w-full border border-[#1A1A1A] p-2.5 text-xs font-mono focus:outline-none focus:border-[#ba0013] transition-all bg-[#F9F9F9]"
                     style={{ borderRadius: "0px" }}
                     required
@@ -211,7 +220,7 @@ export default function ContactPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="PLACEHOLDER"
+                  placeholder=""
                   className="w-full border border-[#1A1A1A] p-2.5 text-xs font-mono focus:outline-none focus:border-[#ba0013] transition-all bg-[#F9F9F9]"
                   style={{ borderRadius: "0px" }}
                   required
@@ -246,7 +255,7 @@ export default function ContactPage() {
                   name="details"
                   value={formData.details}
                   onChange={handleChange}
-                  placeholder="PLACEHOLDER"
+                  placeholder=""
                   rows={4}
                   className="w-full border border-[#1A1A1A] p-2.5 text-xs font-sans focus:outline-none focus:border-[#ba0013] transition-all bg-[#F9F9F9] resize-none"
                   style={{ borderRadius: "0px" }}

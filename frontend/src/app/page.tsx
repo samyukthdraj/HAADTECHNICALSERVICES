@@ -28,11 +28,11 @@ export default function Home() {
               <span className="hts-label-sm text-[#006d39] font-bold tracking-[0.2em] block">
                 • DUBAI TECHNICAL SERVICES PROVIDER
               </span>
-              <h2 className="hts-display-lg font-black text-[#1A1A1A] leading-tight">
-                INDUSTRIAL SCALE PRECISION CONTRACTING & MANPOWER
+              <h2 className="hts-display-lg font-black text-[#1A1A1A] leading-tight uppercase">
+                {settings.aboutMissionTitle}
               </h2>
               <p className="hts-body-lg text-[#5c5b5b] leading-relaxed">
-                HAAD Technical Services Co. L.L.C. is an engineered solutions contractor based in Dubai, UAE. We specialize in MEP contracting, electrical installations, HVAC retrofits, and high-quality skilled manpower supply for commercial, civil, and industrial developments.
+                {settings.aboutMissionText}
               </p>
             </div>
 
@@ -70,17 +70,17 @@ export default function Home() {
               <div className="border border-[#1A1A1A] bg-white p-4 text-center">
                 <span className="hts-label-sm text-[10px] text-[#5c5b5b] block">COMPLETED PROJECTS</span>
                 <span className="hts-display-lg text-3xl font-black text-[#1A1A1A] block mt-1">120+</span>
-                <span className="hts-label-sm text-[9px] text-[#5c5b5b] block mt-0.5">IN UAE DUBAI</span>
+                <span className="hts-label-sm text-[9px] text-[#5c5b5b] block mt-0.5 font-sans">IN UAE DUBAI</span>
               </div>
 
               <div className="border border-[#1A1A1A] bg-white p-4 text-center col-span-2">
                 <span className="hts-label-sm text-[10px] text-[#5c5b5b] block">TAX COMPLIANCE</span>
                 <span className="hts-label-md text-xs font-bold text-[#006d39] block mt-2 font-mono">VAT REGISTERED (5%)</span>
-                <span className="hts-label-sm text-[9px] text-[#5c5b5b] block mt-0.5 font-mono">TRN NO: {settings.trnNo}</span>
+                {settings.trnNo && <span className="hts-label-sm text-[9px] text-[#5c5b5b] block mt-0.5 font-mono">TRN NO: {settings.trnNo}</span>}
               </div>
             </div>
 
-            <div className="text-xs text-[#5c5b5b] flex items-center justify-center gap-2 hts-label-sm">
+            <div className="text-xs text-[#5c5b5b] flex items-center justify-center gap-2 hts-label-sm uppercase text-center leading-relaxed">
               <Award className="w-4 h-4 text-[#ba0013]" /> REGISTERED COMMERCIAL LICENSE NO. {settings.licenseNo}
             </div>
           </div>
@@ -100,9 +100,9 @@ export default function Home() {
                 <div className="w-10 h-10 border border-[#1A1A1A] flex items-center justify-center bg-[#F4F4F4]">
                   <Hammer className="w-5 h-5 text-[#ba0013]" />
                 </div>
-                <h4 className="hts-headline-md text-lg font-bold text-[#1A1A1A]">MEP CONTRACTING</h4>
+                <h4 className="hts-headline-md text-lg font-bold text-[#1A1A1A] uppercase">{settings.competency1Title}</h4>
                 <p className="hts-body-md text-sm text-[#5c5b5b] leading-relaxed">
-                  Design, installation, commissioning and maintenance of mechanical, electrical, and plumbing engineering frameworks. High density drawings and structural layout design.
+                  {settings.competency1Text}
                 </p>
               </div>
               <span className="hts-label-sm text-[10px] text-[#ba0013] font-bold">CO-OP CODE: HTS-MEP</span>
@@ -114,9 +114,9 @@ export default function Home() {
                 <div className="w-10 h-10 border border-[#1A1A1A] flex items-center justify-center bg-[#F4F4F4]">
                   <Users className="w-5 h-5 text-[#006d39]" />
                 </div>
-                <h4 className="hts-headline-md text-lg font-bold text-[#1A1A1A]">MANPOWER PROVISIONS</h4>
+                <h4 className="hts-headline-md text-lg font-bold text-[#1A1A1A] uppercase">{settings.competency2Title}</h4>
                 <p className="hts-body-md text-sm text-[#5c5b5b] leading-relaxed">
-                  On-demand supply of skilled, semi-skilled, and general laborers. Vetted HVAC technicians, certified electricians, pipe-fitters, civil technicians, and industrial welders.
+                  {settings.competency2Text}
                 </p>
               </div>
               <span className="hts-label-sm text-[10px] text-[#006d39] font-bold">CO-OP CODE: HTS-MWS</span>
@@ -128,9 +128,9 @@ export default function Home() {
                 <div className="w-10 h-10 border border-[#1A1A1A] flex items-center justify-center bg-[#F4F4F4]">
                   <Lightbulb className="w-5 h-5 text-[#ba0013]" />
                 </div>
-                <h4 className="hts-headline-md text-lg font-bold text-[#1A1A1A]">FACILITIES MANAGEMENT</h4>
+                <h4 className="hts-headline-md text-lg font-bold text-[#1A1A1A] uppercase">{settings.competency3Title}</h4>
                 <p className="hts-body-md text-sm text-[#5c5b5b] leading-relaxed">
-                  Preventive maintenance contracts, HVAC troubleshooting, emergency backup lighting setups, water pump overhauls, and general technical services for property managers.
+                  {settings.competency3Text}
                 </p>
               </div>
               <span className="hts-label-sm text-[10px] text-[#1A1A1A] font-bold">CO-OP CODE: HTS-FMS</span>

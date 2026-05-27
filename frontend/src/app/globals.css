@@ -140,64 +140,156 @@
   }
 }
 
-/* Custom HTS Typography helper classes */
+/* Custom HTS Typography helper classes - Mobile Responsive Scaling */
 .hts-display-lg {
   font-family: var(--font-ibm-plex), sans-serif;
-  font-size: 48px;
+  font-size: 24px;
   font-weight: 700;
-  line-height: 56px;
+  line-height: 30px;
   letter-spacing: -0.02em;
+}
+
+@media (min-width: 640px) {
+  .hts-display-lg {
+    font-size: 34px;
+    line-height: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hts-display-lg {
+    font-size: 48px;
+    line-height: 56px;
+  }
 }
 
 .hts-headline-lg {
   font-family: var(--font-ibm-plex), sans-serif;
-  font-size: 32px;
+  font-size: 20px;
   font-weight: 700;
-  line-height: 40px;
+  line-height: 26px;
 }
 
-@media (max-width: 600px) {
+@media (min-width: 640px) {
   .hts-headline-lg {
-    font-size: 24px;
+    font-size: 26px;
     line-height: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hts-headline-lg {
+    font-size: 32px;
+    line-height: 40px;
   }
 }
 
 .hts-headline-md {
   font-family: var(--font-ibm-plex), sans-serif;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 600;
-  line-height: 32px;
+  line-height: 24px;
+}
+
+@media (min-width: 768px) {
+  .hts-headline-md {
+    font-size: 24px;
+    line-height: 32px;
+  }
 }
 
 .hts-body-lg {
   font-family: var(--font-ibm-plex), sans-serif;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 400;
-  line-height: 28px;
+  line-height: 22px;
+}
+
+@media (min-width: 768px) {
+  .hts-body-lg {
+    font-size: 18px;
+    line-height: 28px;
+  }
 }
 
 .hts-body-md {
   font-family: var(--font-ibm-plex), sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
-  line-height: 24px;
+  line-height: 20px;
+}
+
+@media (min-width: 768px) {
+  .hts-body-md {
+    font-size: 16px;
+    line-height: 24px;
+  }
 }
 
 .hts-label-md {
-  font-family: var(--font-jetbrains-mono), monospace;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.hts-label-sm {
   font-family: var(--font-jetbrains-mono), monospace;
   font-size: 12px;
   font-weight: 500;
   line-height: 16px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+  .hts-label-md {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+.hts-label-sm {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+  .hts-label-sm {
+    font-size: 12px;
+    line-height: 16px;
+  }
+}
+
+/* Print Overrides for Official Corporate Quotation */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  header, footer, nav, button, .no-print, .print\:hidden {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .print-document-container {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  table {
+    page-break-inside: auto;
+    width: 100% !important;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
 }

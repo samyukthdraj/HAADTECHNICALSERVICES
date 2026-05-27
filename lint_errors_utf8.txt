@@ -1,0 +1,200 @@
+﻿
+> frontend@0.1.0 lint
+> eslint
+
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\app\admin\page.tsx
+    4:8   warning  'Image' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  156:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\app\admin\page.tsx:156:7
+  154 |   useEffect(() => {
+  155 |     if (settings) {
+> 156 |       setFormSettings({
+      |       ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  157 |         licenseNo: settings.licenseNo || "",
+  158 |         trnNo: settings.trnNo || "",
+  159 |         address: settings.address || "",  react-hooks/set-state-in-effect
+  187:7   error    Error: Cannot access variable before it is declared
+
+`fetchInquiries` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\app\admin\page.tsx:187:7
+  185 |   useEffect(() => {
+  186 |     if (isAuthenticated) {
+> 187 |       fetchInquiries();
+      |       ^^^^^^^^^^^^^^ `fetchInquiries` accessed before it is declared
+  188 |       fetchQuotations();
+  189 |       fetchServices();
+  190 |       fetchTeam();
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\app\admin\page.tsx:194:3
+  192 |   }, [isAuthenticated]);
+  193 |
+> 194 |   const fetchInquiries = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 195 |     try {
+      | ^^^^^^^^^
+> 196 |       const res = await fetch(`${getBackendUrl()}/api/inquiry`);
+      ΓÇª
+      | ^^^^^^^^^
+> 203 |     }
+      | ^^^^^^^^^
+> 204 |   };
+      | ^^^^^ `fetchInquiries` is declared here
+  205 |
+  206 |   const fetchQuotations = async () => {
+  207 |     try {                   react-hooks/immutability
+  188:7   error    Error: Cannot access variable before it is declared
+
+`fetchQuotations` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\app\admin\page.tsx:188:7
+  186 |     if (isAuthenticated) {
+  187 |       fetchInquiries();
+> 188 |       fetchQuotations();
+      |       ^^^^^^^^^^^^^^^ `fetchQuotations` accessed before it is declared
+  189 |       fetchServices();
+  190 |       fetchTeam();
+  191 |     }
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\app\admin\page.tsx:206:3
+  204 |   };
+  205 |
+> 206 |   const fetchQuotations = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 207 |     try {
+      | ^^^^^^^^^
+> 208 |       const res = await fetch(`${getBackendUrl()}/api/quotation`);
+      ΓÇª
+      | ^^^^^^^^^
+> 215 |     }
+      | ^^^^^^^^^
+> 216 |   };
+      | ^^^^^ `fetchQuotations` is declared here
+  217 |
+  218 |   const fetchServices = async () => {
+  219 |     try {                                               react-hooks/immutability
+  189:7   error    Error: Cannot access variable before it is declared
+
+`fetchServices` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\app\admin\page.tsx:189:7
+  187 |       fetchInquiries();
+  188 |       fetchQuotations();
+> 189 |       fetchServices();
+      |       ^^^^^^^^^^^^^ `fetchServices` accessed before it is declared
+  190 |       fetchTeam();
+  191 |     }
+  192 |   }, [isAuthenticated]);
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\app\admin\page.tsx:218:3
+  216 |   };
+  217 |
+> 218 |   const fetchServices = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 219 |     try {
+      | ^^^^^^^^^
+> 220 |       const res = await fetch(`${getBackendUrl()}/api/services`);
+      ΓÇª
+      | ^^^^^^^^^
+> 227 |     }
+      | ^^^^^^^^^
+> 228 |   };
+      | ^^^^^ `fetchServices` is declared here
+  229 |
+  230 |   const fetchTeam = async () => {
+  231 |     try {                                                                  react-hooks/immutability
+  190:7   error    Error: Cannot access variable before it is declared
+
+`fetchTeam` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\app\admin\page.tsx:190:7
+  188 |       fetchQuotations();
+  189 |       fetchServices();
+> 190 |       fetchTeam();
+      |       ^^^^^^^^^ `fetchTeam` accessed before it is declared
+  191 |     }
+  192 |   }, [isAuthenticated]);
+  193 |
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\app\admin\page.tsx:230:3
+  228 |   };
+  229 |
+> 230 |   const fetchTeam = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 231 |     try {
+      | ^^^^^^^^^
+> 232 |       const res = await fetch(`${getBackendUrl()}/api/team`);
+      ΓÇª
+      | ^^^^^^^^^
+> 239 |     }
+      | ^^^^^^^^^
+> 240 |   };
+      | ^^^^^ `fetchTeam` is declared here
+  241 |
+  242 |   // Login handler
+  243 |   const handleLogin = (e: React.FormEvent) => {                                                                                               react-hooks/immutability
+  192:6   warning  React Hook useEffect has missing dependencies: 'fetchInquiries', 'fetchQuotations', 'fetchServices', and 'fetchTeam'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react-hooks/exhaustive-deps
+  310:14  warning  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  343:14  warning  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  387:14  warning  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  419:14  warning  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  441:14  warning  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  466:14  warning  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  489:33  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\app\services\page.tsx
+  47:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  53:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\components\QuotationCalculator.tsx
+    4:63  warning  'Ship' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   71:5   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\components\QuotationCalculator.tsx:71:5
+  69 |   useEffect(() => {
+  70 |     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+> 71 |     setProjectRef(`HTS-QT-2026-${randomSuffix}`);
+     |     ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  72 |   }, []);
+  73 |
+  74 |   const handleAddRow = () => {  react-hooks/set-state-in-effect
+  186:21  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+  210:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @next/next/no-img-element
+  254:48  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\context\SettingsContext.tsx
+  126:19  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  159:5   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\SamyukthDharmarajan\Downloads\HAADTECHNICALSERVICESS\frontend\src\context\SettingsContext.tsx:159:5
+  157 |
+  158 |   useEffect(() => {
+> 159 |     refreshSettings();
+      |     ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  160 |   }, []);
+  161 |
+  162 |   return (  react-hooks/set-state-in-effect
+  160:6   warning  React Hook useEffect has a missing dependency: 'refreshSettings'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/exhaustive-deps
+
+Γ£û 24 problems (13 errors, 11 warnings)
+

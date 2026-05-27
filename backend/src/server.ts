@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import { connectDB } from "./db";
 import { Quotation } from "./models/Quotation";
 import { Inquiry } from "./models/Inquiry";
+import { Settings } from "./models/Settings";
 
 // Load environment variables
 dotenv.config();
@@ -20,7 +21,7 @@ app.use(cors({
     "http://localhost:3000",
     "https://haadtechnicalservicescollc.vercel.app"
   ],
-  methods: ["GET", "POST", "OPTIONS"],
+  methods: ["GET", "POST", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
@@ -49,7 +50,7 @@ app.get("/api/health", (req: Request, res: Response) => {
     status: "ok",
     message: "HAAD Technical Services Backend API is active",
     timestamp: new Date().toISOString(),
-    version: "1.2.0",
+    version: "1.3.0",
     dbState: mongooseConnectionState()
   });
 });
@@ -64,7 +65,62 @@ function mongooseConnectionState() {
   }
 }
 
-// Quotation Submission Endpoint
+// ==========================================
+// CORPORATE SETTINGS ENDPOINTS
+// ==========================================
+
+// Get Settings
+app.get("/api/settings", async (req: Request, res: Response) => {
+  try {
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = new Settings();
+      await settings.save();
+    }
+    res.status(200).json(settings);
+  } catch (error) {
+    console.error("Fetch settings error:", error);
+    res.status(500).json({ success: false, message: "Failed to retrieve global configurations." });
+  }
+});
+
+// Update Settings
+app.post("/api/settings", async (req: Request, res: Response) => {
+  try {
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = new Settings(req.body);
+    } else {
+      Object.assign(settings, req.body);
+    }
+    await settings.save();
+    res.status(200).json({
+      success: true,
+      message: "Corporate details updated successfully in database.",
+      settings
+    });
+  } catch (error) {
+    console.error("Save settings error:", error);
+    res.status(500).json({ success: false, message: "Failed to save corporate configurations." });
+  }
+});
+
+// ==========================================
+// QUOTATION ENDPOINTS
+// ==========================================
+
+// Get all Quotations (Latest first)
+app.get("/api/quotation", async (req: Request, res: Response) => {
+  try {
+    const quotations = await Quotation.find().sort({ createdAt: -1 });
+    res.status(200).json(quotations);
+  } catch (error) {
+    console.error("Fetch quotations error:", error);
+    res.status(500).json({ success: false, message: "Failed to retrieve quotations list." });
+  }
+});
+
+// Submit Quotation
 app.post("/api/quotation", async (req: Request, res: Response) => {
   const {
     clientName,
@@ -80,14 +136,6 @@ app.post("/api/quotation", async (req: Request, res: Response) => {
 
   // Audit Log in Server Console
   console.log(`[QUOTATION SUBMISSION] - Ref: ${projectRef}`);
-  console.log(`- Date: ${date}`);
-  console.log(`- Client: ${clientName}`);
-  console.log(`- Worksite: ${projectLocation}`);
-  console.log(`- Status: ${status?.toUpperCase()}`);
-  console.log(`- Total Items: ${items?.length}`);
-  console.log(`- Subtotal: ${subtotal} AED`);
-  console.log(`- VAT (5%): ${vat} AED`);
-  console.log(`- Total: ${total} AED`);
   console.log("-----------------------------------------");
 
   // Input Validation
@@ -136,17 +184,41 @@ app.post("/api/quotation", async (req: Request, res: Response) => {
   }
 });
 
-// Inquiry Submission Endpoint
+// Delete Quotation by ID
+app.delete("/api/quotation/:id", async (req: Request, res: Response) => {
+  try {
+    const deleted = await Quotation.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Quotation record not found." });
+    }
+    res.status(200).json({ success: true, message: "Quotation record deleted successfully." });
+  } catch (error) {
+    console.error("Delete quotation error:", error);
+    res.status(500).json({ success: false, message: "Failed to delete quotation record." });
+  }
+});
+
+// ==========================================
+// INQUIRY ENDPOINTS
+// ==========================================
+
+// Get all Inquiries (Latest first)
+app.get("/api/inquiry", async (req: Request, res: Response) => {
+  try {
+    const inquiries = await Inquiry.find().sort({ createdAt: -1 });
+    res.status(200).json(inquiries);
+  } catch (error) {
+    console.error("Fetch inquiries error:", error);
+    res.status(500).json({ success: false, message: "Failed to retrieve inquiries list." });
+  }
+});
+
+// Submit Inquiry
 app.post("/api/inquiry", async (req: Request, res: Response) => {
   const { entityName, contactNo, email, serviceClassification, details } = req.body;
 
   // Audit Log in Server Console
-  console.log(`[SERVICE INQUIRY LOG]`);
-  console.log(`- Entity Name: ${entityName}`);
-  console.log(`- Contact No: ${contactNo}`);
-  console.log(`- Email: ${email}`);
-  console.log(`- Classification: ${serviceClassification}`);
-  console.log(`- Details: ${details || "No details provided"}`);
+  console.log(`[SERVICE INQUIRY LOG] - Entity Name: ${entityName}`);
   console.log("-----------------------------------------");
 
   // Input Validation
@@ -178,6 +250,20 @@ app.post("/api/inquiry", async (req: Request, res: Response) => {
       success: false,
       message: "Failed to store service inquiry log in database."
     });
+  }
+});
+
+// Delete Inquiry by ID
+app.delete("/api/inquiry/:id", async (req: Request, res: Response) => {
+  try {
+    const deleted = await Inquiry.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Inquiry log not found." });
+    }
+    res.status(200).json({ success: true, message: "Inquiry log deleted successfully." });
+  } catch (error) {
+    console.error("Delete inquiry error:", error);
+    res.status(500).json({ success: false, message: "Failed to delete inquiry log." });
   }
 });
 

@@ -39,7 +39,7 @@ export default function AboutPage() {
     <div className="flex flex-col min-h-screen bg-background selection:bg-[#ba0013] selection:text-white">
       <Header />
 
-      <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-6 py-8 flex flex-col gap-12">
+      <main className="flex-1 w-full px-4 md:px-8 lg:px-12 py-8 flex flex-col gap-12">
         {/* Section 1: Hero Profile */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border-b border-[#1A1A1A] pb-10">
           <div className="lg:col-span-7 flex flex-col gap-4">

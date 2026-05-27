@@ -5,8 +5,10 @@ import Image from "next/image";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { Phone, Mail, MapPin, ClipboardList, CheckCircle2, AlertTriangle } from "lucide-react";
+import { useSettings } from "../../context/SettingsContext";
 
 export default function ContactPage() {
+  const { settings } = useSettings();
   const [formData, setFormData] = useState({
     entityName: "",
     contactNo: "",
@@ -88,7 +90,7 @@ export default function ContactPage() {
     <div className="flex flex-col min-h-screen bg-background selection:bg-[#ba0013] selection:text-white">
       <Header />
 
-      <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-6 py-8 flex flex-col gap-10">
+      <main className="flex-1 w-full px-4 md:px-8 lg:px-12 py-8 flex flex-col gap-10">
         {/* Title Header */}
         <div className="border-b border-[#1A1A1A] pb-6">
           <span className="hts-label-sm text-xs text-[#006d39] font-bold block mb-1">
@@ -113,8 +115,8 @@ export default function ContactPage() {
               <p className="hts-body-md text-[11px] text-[#5c5b5b] font-sans">
                 Immediate response for urgent technical services.
               </p>
-              <span className="hts-display-lg text-2xl font-black text-[#1A1A1A] mt-1 block tracking-tight">
-                +971 50 6790358
+              <span className="hts-display-lg text-xl md:text-2xl font-black text-[#1A1A1A] mt-1 block tracking-tight">
+                {settings.phone}
               </span>
             </div>
 
@@ -126,8 +128,8 @@ export default function ContactPage() {
               <p className="hts-body-md text-[11px] text-[#5c5b5b] font-sans">
                 For project proposals, quotes, and documentation.
               </p>
-              <span className="hts-display-lg text-lg font-bold text-[#1A1A1A] mt-1 block tracking-tight select-all">
-                abdullakalathil32@gmail.com
+              <span className="hts-display-lg text-base md:text-lg font-bold text-[#1A1A1A] mt-1 block tracking-tight select-all">
+                {settings.email}
               </span>
             </div>
 
@@ -138,7 +140,7 @@ export default function ContactPage() {
                   <MapPin className="w-3.5 h-3.5 text-[#ba0013]" /> HQ DUBAI
                 </span>
                 <p className="text-[11px] text-[#5c5b5b] font-sans mt-2 leading-relaxed">
-                  <strong>HQ:</strong> ART TOWER, 1ST FLOOR, OFFICE NO 105, AL RAFFA, DUBAI, UNITED ARAB EMIRATES
+                  <strong>HQ:</strong> {settings.address.toUpperCase()}
                 </p>
               </div>
 
@@ -149,6 +151,7 @@ export default function ContactPage() {
                   alt="Dubai Garhoud Cityscape"
                   fill
                   className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               </div>
             </div>
@@ -174,7 +177,7 @@ export default function ContactPage() {
                     name="entityName"
                     value={formData.entityName}
                     onChange={handleChange}
-                    placeholder="Company or Individual Name"
+                    placeholder="PLACEHOLDER"
                     className="w-full border border-[#1A1A1A] p-2.5 text-xs font-mono focus:outline-none focus:border-[#ba0013] transition-all bg-[#F9F9F9]"
                     style={{ borderRadius: "0px" }}
                     required
@@ -190,7 +193,7 @@ export default function ContactPage() {
                     name="contactNo"
                     value={formData.contactNo}
                     onChange={handleChange}
-                    placeholder="+971 -- -------"
+                    placeholder="PLACEHOLDER"
                     className="w-full border border-[#1A1A1A] p-2.5 text-xs font-mono focus:outline-none focus:border-[#ba0013] transition-all bg-[#F9F9F9]"
                     style={{ borderRadius: "0px" }}
                     required
@@ -208,7 +211,7 @@ export default function ContactPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="operations@yourcompany.com"
+                  placeholder="PLACEHOLDER"
                   className="w-full border border-[#1A1A1A] p-2.5 text-xs font-mono focus:outline-none focus:border-[#ba0013] transition-all bg-[#F9F9F9]"
                   style={{ borderRadius: "0px" }}
                   required
@@ -243,7 +246,7 @@ export default function ContactPage() {
                   name="details"
                   value={formData.details}
                   onChange={handleChange}
-                  placeholder="Specify project scope, manpower requirements, or technical issue..."
+                  placeholder="PLACEHOLDER"
                   rows={4}
                   className="w-full border border-[#1A1A1A] p-2.5 text-xs font-sans focus:outline-none focus:border-[#ba0013] transition-all bg-[#F9F9F9] resize-none"
                   style={{ borderRadius: "0px" }}

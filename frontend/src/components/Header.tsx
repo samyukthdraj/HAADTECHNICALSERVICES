@@ -4,9 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Phone, Mail, MapPin, Wrench } from "lucide-react";
+import { useSettings } from "../context/SettingsContext";
 
 export default function Header() {
   const pathname = usePathname();
+  const { settings } = useSettings();
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -18,31 +20,31 @@ export default function Header() {
   return (
     <header className="w-full bg-white border-b border-[#1A1A1A] sticky top-0 z-50">
       {/* Top Document Metadata Ribbon - Document Style */}
-      <div className="w-full bg-[#1A1A1A] text-[#F4F4F4] py-1.5 px-4 md:px-8 border-b border-[#1A1A1A]">
-        <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-2 md:gap-4 hts-label-sm text-[11px]">
+      <div className="w-full bg-[#1A1A1A] text-[#F4F4F4] py-1.5 px-4 md:px-8 lg:px-12 border-b border-[#1A1A1A]">
+        <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-2 md:gap-4 hts-label-sm text-[11px]">
           <div className="flex flex-wrap items-center gap-4">
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 uppercase">
               <MapPin className="w-3.5 h-3.5 text-[#e31e24]" />
-              DUBAI, UNITED ARAB EMIRATES
+              {settings.address.split(",").slice(-2).join(",").toUpperCase().trim()}
             </span>
             <span className="hidden md:inline-block text-[#5c5b5b]">|</span>
             <span className="flex items-center gap-1.5">
               <Wrench className="w-3.5 h-3.5 text-[#008f4c]" />
-              LICENSE NO: 884721
+              LICENSE NO: {settings.licenseNo}
             </span>
             <span className="hidden md:inline-block text-[#5c5b5b]">|</span>
             <span className="flex items-center gap-1.5">
-              TRN NO: 100482591600003
+              TRN NO: {settings.trnNo}
             </span>
           </div>
           <div className="flex items-center gap-4 self-end md:self-auto">
-            <span className="text-[#dadada]">ACTIVE STATUS: CERTIFIED ME CONTRACTOR</span>
+            <span className="text-[#dadada] uppercase">ACTIVE STATUS: CERTIFIED TECHNICAL SERVICES</span>
           </div>
         </div>
       </div>
 
       {/* Main Navigation Bar */}
-      <div className="max-w-[1200px] mx-auto px-4 md:px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="w-full px-4 md:px-8 lg:px-12 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Branding & Logo */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-11 h-11 border border-[#1A1A1A] p-0.5 bg-white transition-all group-hover:border-[#e31e24]" style={{ borderRadius: "0px" }}>
@@ -92,20 +94,20 @@ export default function Header() {
           <div className="flex items-center gap-4 shrink-0">
             {/* Phone Icon */}
             <a
-              href="tel:+971506790358"
+              href={`tel:${settings.phone}`}
               className="p-2 border border-[#1A1A1A] hover:bg-[#F4F4F4] transition-all text-[#1A1A1A]"
               style={{ borderRadius: "0px" }}
-              title="Call Direct Line: +971 50 6790358"
+              title={`Call Direct Line: ${settings.phone}`}
             >
               <Phone className="w-4 h-4" />
             </a>
 
             {/* Email Icon */}
             <a
-              href="mailto:abdullakalathil32@gmail.com"
+              href={`mailto:${settings.email}`}
               className="p-2 border border-[#1A1A1A] hover:bg-[#F4F4F4] transition-all text-[#1A1A1A]"
               style={{ borderRadius: "0px" }}
-              title="Email: abdullakalathil32@gmail.com"
+              title={`Email: ${settings.email}`}
             >
               <Mail className="w-4 h-4" />
             </a>

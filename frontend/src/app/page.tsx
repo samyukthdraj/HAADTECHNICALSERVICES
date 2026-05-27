@@ -1,16 +1,21 @@
+"use client";
+
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import QuotationCalculator from "../components/QuotationCalculator";
 import { Hammer, Users, Lightbulb, Compass, Award, ShieldCheck } from "lucide-react";
+import { useSettings } from "../context/SettingsContext";
 
 export default function Home() {
+  const { settings } = useSettings();
+
   return (
     <div className="flex flex-col min-h-screen bg-background selection:bg-[#ba0013] selection:text-white">
       {/* Navigation Header */}
       <Header />
 
       {/* Main Page Layout */}
-      <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-6 py-8 flex flex-col gap-12">
+      <main className="flex-1 w-full px-4 md:px-8 lg:px-12 py-8 flex flex-col gap-12">
         
         {/* Section 1: Hero / Corporate Profile */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch border-2 border-[#1A1A1A] bg-white relative p-6 md:p-10" style={{ borderRadius: "0px" }}>
@@ -70,13 +75,13 @@ export default function Home() {
 
               <div className="border border-[#1A1A1A] bg-white p-4 text-center col-span-2">
                 <span className="hts-label-sm text-[10px] text-[#5c5b5b] block">TAX COMPLIANCE</span>
-                <span className="hts-label-md text-xs font-bold text-[#006d39] block mt-2">VAT REGISTERED (5%)</span>
-                <span className="hts-label-sm text-[9px] text-[#5c5b5b] block mt-0.5">TRN NO: 100482591600003</span>
+                <span className="hts-label-md text-xs font-bold text-[#006d39] block mt-2 font-mono">VAT REGISTERED (5%)</span>
+                <span className="hts-label-sm text-[9px] text-[#5c5b5b] block mt-0.5 font-mono">TRN NO: {settings.trnNo}</span>
               </div>
             </div>
 
             <div className="text-xs text-[#5c5b5b] flex items-center justify-center gap-2 hts-label-sm">
-              <Award className="w-4 h-4 text-[#ba0013]" /> REGISTERED COMMERCIAL LICENSE NO. 884721
+              <Award className="w-4 h-4 text-[#ba0013]" /> REGISTERED COMMERCIAL LICENSE NO. {settings.licenseNo}
             </div>
           </div>
         </section>
@@ -170,7 +175,7 @@ export default function Home() {
             <div>
               <h5 className="hts-label-md text-xs font-bold text-white">LICENSED CONTRACTORS</h5>
               <p className="text-xs text-[#dadada] mt-1 font-sans">
-                Fully registered trade entity. Certified under License No. 884721 to perform professional MEP services.
+                Fully registered trade entity. Certified under License No. {settings.licenseNo} to perform professional MEP services.
               </p>
             </div>
           </div>

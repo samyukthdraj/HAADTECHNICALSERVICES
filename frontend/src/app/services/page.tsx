@@ -65,7 +65,7 @@ export default function ServicesPage() {
     <div className="flex flex-col min-h-screen bg-background selection:bg-[#ba0013] selection:text-white">
       <Header />
 
-      <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-6 py-8 flex flex-col gap-10">
+      <main className="flex-1 w-full px-4 md:px-8 lg:px-12 py-8 flex flex-col gap-10">
         {/* Title Header */}
         <div className="border-b border-[#1A1A1A] pb-6">
           <span className="hts-label-sm text-xs text-[#006d39] font-bold block mb-1">

@@ -75,6 +75,35 @@ app.post("/api/quotation", (req: Request, res: Response) => {
   });
 });
 
+// Inquiry Submission Endpoint
+app.post("/api/inquiry", (req: Request, res: Response) => {
+  const { entityName, contactNo, email, serviceClassification, details } = req.body;
+
+  // Audit Log in Server Console
+  console.log(`[SERVICE INQUIRY LOG]`);
+  console.log(`- Entity Name: ${entityName}`);
+  console.log(`- Contact No: ${contactNo}`);
+  console.log(`- Email: ${email}`);
+  console.log(`- Classification: ${serviceClassification}`);
+  console.log(`- Details: ${details || "No details provided"}`);
+  console.log("-----------------------------------------");
+
+  // Input Validation
+  if (!entityName || !contactNo || !email) {
+    return res.status(400).json({
+      success: false,
+      message: "Required fields (entityName, contactNo, email) are missing."
+    });
+  }
+
+  // Simulate ERP sync
+  res.status(201).json({
+    success: true,
+    message: `Inquiry for '${entityName}' successfully registered in HTS ERP Server. Our team will contact you at ${contactNo} or ${email} shortly.`,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Start Express Server
 app.listen(PORT, () => {
   console.log(`=================================================`);
